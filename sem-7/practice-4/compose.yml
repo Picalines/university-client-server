@@ -1,0 +1,40 @@
+services:
+  server:
+    container_name: server
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+      - "5200:5200"
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/postgres
+      PG_USER: postgres
+      PG_PASSWORD: postgres
+    depends_on:
+      - db
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+
+  db:
+    container_name: db
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+
+volumes:
+  db:
