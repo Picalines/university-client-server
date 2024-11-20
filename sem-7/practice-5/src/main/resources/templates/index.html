@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Децентрализованная Система Загрузки Файлов</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1>Загруженные файлы</h1>
+    <form action="/files" method="post" enctype="multipart/form-data"
+          class="form-inline">
+        <div class="form-group">
+            <input type="file" class="form-control-file" name="file" accept=".txt, .pdf, .doc, .docx">
+        </div>
+        <div class="form-group">
+            <input type="text" class="form-control" name="filename" placeholder="Имя файла (без расширения)">
+        </div>
+        <button type="submit" class="btn btn-primary">Загрузить</button>
+    </form>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">Имя файла</th>
+            <th scope="col">Ссылка на скачивание</th>
+            <th scope="col">Размер файла (байты)</th>
+            <th scope="col">Удалить</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="file : ${files}">
+            <td th:text="${file.name}"></td>
+            <td>
+                <form action="@{'/files/' + ${file.id}}" th:method="delete">
+                    <button type="submit">*Click*</button>
+                </form>
+            </td>
+            <td th:text="${file.size}"></td>
+            <td>
+                <a th:href="@{'/files/' + ${file.id}}">*Click*</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
