@@ -1,0 +1,6 @@
+rootProject.name = 'practice-7'
+buildCache {
+    local {
+        enabled = true
+    }
+}
