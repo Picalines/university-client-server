@@ -31,7 +31,7 @@ public class Task2 {
     private static int calculateSquare(int number) {
         try {
             var delayInSeconds = ThreadLocalRandom.current().nextInt(1, 6);
-            Thread.sleep(delayInSeconds * 1000);
+            Thread.sleep(delayInSeconds * 1000L);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
