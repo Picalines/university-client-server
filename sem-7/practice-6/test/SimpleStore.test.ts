@@ -43,4 +43,50 @@ describe("SimpleStore", () => {
         .withArgs([1n, "product", 100n, 1n]);
     });
   });
+
+  describe("Payment", () => {
+    it("should send eth to the owner on purchaseProduct", async () => {
+      const { store, owner, customer } = await loadFixture(
+        deployOneYearLockFixture
+      );
+
+      await store.addProduct("product", 100n, 1n);
+
+      await expect(
+        store.connect(customer).purchaseProduct(1n, 1n, { value: 100 })
+      ).to.changeEtherBalances([owner, customer], [100n, -100n]);
+    });
+
+    it("should not send more eth than the product costs", async () => {
+      const { store, owner, customer } = await loadFixture(
+        deployOneYearLockFixture
+      );
+
+      await store.addProduct("product", 100n, 1n);
+
+      await expect(
+        store.connect(customer).purchaseProduct(1n, 1n, { value: 900 })
+      ).to.changeEtherBalances([owner, customer], [100n, -100n]);
+    });
+
+    it("should revert if there's not enough eth", async () => {
+      const { store, customer } = await loadFixture(deployOneYearLockFixture);
+
+      await store.addProduct("product", 100n, 1n);
+
+      await expect(
+        store.connect(customer).purchaseProduct(1n, 1n, { value: 50 })
+      ).to.revertedWith("Insufficient funds sent");
+    });
+
+    it("should revert if there's not enough products", async () => {
+      const { store, customer } = await loadFixture(deployOneYearLockFixture);
+
+      await store.addProduct("product", 100n, 1n);
+
+      await expect(
+        store.connect(customer).purchaseProduct(1n, 3n, { value: 100 })
+      ).to.revertedWith("Not enough stock available");
+    });
+  });
 });

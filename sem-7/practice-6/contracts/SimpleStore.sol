@@ -2,7 +2,6 @@ pragma solidity ^0.8.0;
 
 contract SimpleStore {
     address public owner;
-    mapping(address => uint256) public balances;
     mapping(uint256 => Product) public products;
 
     uint256 public productCount = 0;
@@ -51,27 +50,19 @@ contract SimpleStore {
         require(_productId != 0, "Product not found");
 
         require(product.quantity >= _quantity, "Not enough stock available");
+        product.quantity -= _quantity;
 
         uint256 totalCost = product.price * _quantity;
         require(msg.value >= totalCost, "Insufficient funds sent");
 
-        balances[owner] += totalCost;
-        balances[msg.sender] -= totalCost;
-        product.quantity -= _quantity;
+        if (msg.value > totalCost) {
+            payable(msg.sender).transfer(msg.value - totalCost);
+        }
+
+        payable(owner).transfer(totalCost);
 
         emit ProductPurchased(
             Product(_productId, product.name, product.price, _quantity)
         );
-
-        if (msg.value > totalCost) {
-            payable(msg.sender).transfer(msg.value - totalCost);
-        }
-    }
-
-    function withdrawBalance() public onlyOwner {
-        uint256 balance = balances[owner];
-        require(balance > 0, "No balance to withdraw");
-        balances[owner] = 0;
-        payable(owner).transfer(balance);
     }
 }
